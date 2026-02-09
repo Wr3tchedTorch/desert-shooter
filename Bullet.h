@@ -20,11 +20,11 @@ private:
 public:
     Bullet();
     void setAppearance(sf::Color color, float size);
-    void spawn(float damage, float speed, sf::Vector2f direction);
+    void spawn(float damage, float speed, sf::Vector2f direction, sf::Vector2f startPosition);
     void despawn();
     bool isActive();
 
     void update(float delta);
-    sf::RectangleShape getShape();
+    sf::RectangleShape& getShape();
 };
 

@@ -11,6 +11,9 @@ Weapon::Weapon(sf::Texture& texture, sf::Vector2f origin) : m_Sprite(SPRITE_SIZE
 
 	m_CurrentBulletIndex = 0;
 	m_Bullets = new Bullet[MAX_BULLETS_ALLOWED];
+	
+	m_CanShoot = true;
+	m_TimeSinceLastShotInSeconds = 0;
 }
 
 void Weapon::attachTo(Transformable& target, float offset)
@@ -23,9 +26,19 @@ void Weapon::attachTo(Transformable& target, float offset)
 
 void Weapon::update(float delta, sf::Vector2f mousePosition)
 {
+	if (!m_CanShoot)
+	{
+		m_TimeSinceLastShotInSeconds += delta;
+
+		if (m_TimeSinceLastShotInSeconds >= m_DelayBetweenShotsInSeconds)
+		{
+			m_CanShoot = true;
+		}
+	}
+
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
 	{
-		shoot(50, 300);
+		shoot();
 	}
 
 	for (int i = 0; i < MAX_BULLETS_ALLOWED; i++)
@@ -60,16 +73,37 @@ void Weapon::update(float delta, sf::Vector2f mousePosition)
     setRotation(rotation);
 }
 
-void Weapon::shoot(float damage, float speed)
-{	
-	Bullet& bullet = m_Bullets[m_CurrentBulletIndex];
+void Weapon::setAttributes(float bulletDamage, float bulletSpeed, float delayMilli)
+{
+	m_BulletDamage = bulletDamage;
+	m_BulletSpeed  = bulletSpeed;
+	m_DelayBetweenShotsInSeconds = delayMilli / 1000;
+}
 
-	bullet.setPosition(getPosition());
-	bullet.setAppearance(sf::Color::Blue, 5);
-	bullet.spawn(damage, speed, {1, 0});
+void Weapon::shoot()
+{	
+	if (!m_CanShoot)
+	{
+		return;
+	}
+	m_TimeSinceLastShotInSeconds = 0;
+	m_CanShoot = false;
+
+	Bullet& bullet = m_Bullets[m_CurrentBulletIndex];
+	bullet.setAppearance(sf::Color(0xFAD000FF), 3);
+
+	bullet.getShape().setRotation(getRotation());
+
+	sf::Vector2f dir(1, 0);
+	dir = dir.rotatedBy(getRotation());	
+
+	sf::Vector2f bulletStartPosition(getPosition());
+	bulletStartPosition += SPRITE_SIZE * dir;
+
+	bullet.spawn(m_BulletDamage, m_BulletSpeed, dir, bulletStartPosition);
 
 	m_CurrentBulletIndex++;
-	if (m_CurrentBulletIndex >= 100)
+	if (m_CurrentBulletIndex >= 99)
 	{
 		m_CurrentBulletIndex = 0;
 	}

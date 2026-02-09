@@ -18,6 +18,7 @@ int main()
 	sf::Texture weaponTexture = TextureHolder::GetTexture("graphics/weapons/tilemap_packed.png");
 	Weapon weapon(weaponTexture, {-6, 10});
 	weapon.attachTo(player, 24.0f);
+	weapon.setAttributes(50, 300, 200);
 
 	sf::Texture aimTexture = TextureHolder::GetTexture("graphics/ui/aim_01.png");
 	sf::Sprite  aimSprite(aimTexture);
@@ -38,7 +39,6 @@ int main()
 	{		
 		while (const std::optional event = window.pollEvent())
 		{
-			// "close requested" event: we close the window
 			if (event->is<sf::Event::Closed>())
 				window.close();
 		}	
@@ -52,7 +52,7 @@ int main()
 		weapon.update(delta, globalMousePosition);
 		aimSprite.setPosition(globalMousePosition);
 
-		window.clear(sf::Color::White);
+		window.clear(sf::Color::Black);
 		
 		window.setView(camera);
 		window.draw(player);

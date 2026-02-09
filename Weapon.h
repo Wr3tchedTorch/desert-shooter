@@ -9,11 +9,19 @@ private:
     const int   MAX_BULLETS_ALLOWED = 100;
     const float SPRITE_SIZE = 24;
 
-	AnimatedSprite m_Sprite;
     sf::Transformable* m_Parent;
+	AnimatedSprite m_Sprite;
     sf::Vector2f m_StartOrigin;
+    
     Bullet* m_Bullets;
     int m_CurrentBulletIndex;
+
+    float m_BulletSpeed;
+    float m_BulletDamage;
+
+    float m_DelayBetweenShotsInSeconds;
+    float m_TimeSinceLastShotInSeconds;
+    bool  m_CanShoot;
 
     void draw(sf::RenderTarget& target, sf::RenderStates states) const override
     {
@@ -35,7 +43,7 @@ public:
 
     void attachTo(Transformable& target, float offset);
     void update(float delta, sf::Vector2f mousePosition);
-    void shoot(float damage, float speed);
+    void setAttributes(float bulletDamage, float bulletSpeed, float delayMilli);
+    void shoot();
     Bullet* getBullets();
 };
-
