@@ -71,7 +71,7 @@ void AnimatedSprite::setAnimation(unsigned int startFrame, unsigned int finalFra
 	m_FinalFrame   = finalFrame;
 	m_CurrentFrame = m_StartFrame;
 	m_CurrentRow   = row;
-	m_TimeBetweenFramesInSeconds = delayInSeconds;
+	m_TimeBetweenFramesInSeconds  = delayInSeconds;
 	m_IsLooping = loop;
 }
 
@@ -91,9 +91,10 @@ void AnimatedSprite::update(float delta)
 	{
 		return;
 	}
-
+	
+	std::cout << m_TimeSinceLastFrameInSeconds << "\n";
 	m_TimeSinceLastFrameInSeconds += delta;
-
+	
 	if (m_TimeSinceLastFrameInSeconds > m_TimeBetweenFramesInSeconds)
 	{
 		nextFrame();
@@ -112,7 +113,7 @@ void AnimatedSprite::play()
 {
 	m_IsPlaying = true;
 
-	m_TimeSinceLastFrameInSeconds = 0;
+	m_TimeSinceLastFrameInSeconds = m_TimeBetweenFramesInSeconds;
 
 	updateFrame();
 }
