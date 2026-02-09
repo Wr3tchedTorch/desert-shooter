@@ -12,18 +12,18 @@ private:
 	int m_CurrentRow;
 	bool m_IsLooping;
 	bool m_IsPlaying;
+	bool m_FlipVertical;
+	bool m_FlipHorizontal;
 
 	int m_SpriteSize;
 	int m_RowCount;
 	int m_ColumnCount;
-	sf::IntRect m_SpritesheetBounds;
-
+	
 	bool isFrameInsideBounds(sf::Vector2u frame);
 	void updateFrame();
 	void nextFrame();
 public:
 	AnimatedSprite(
-		sf::IntRect spritesheetBounds,
 		unsigned int spriteSize,
 		unsigned int rowCount,
 		unsigned int columnCount,
@@ -37,9 +37,15 @@ public:
 		float delayInSeconds, 
 		bool loop = false
 	);
+	void setFrame(unsigned int frameIndex, unsigned int row);
 	void update(float delta);
 	void stop();
 	void play();
+	void flipHorizontal();
+	void flipVertical();
+
+	bool isFlipedVertical()   const;
+	bool isFlipedHorizontal() const;
 
 	bool isPlaying() const;
 };

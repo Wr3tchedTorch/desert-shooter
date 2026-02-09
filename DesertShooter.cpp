@@ -5,6 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include "TextureHolder.h"
 #include "Player.h"
+#include "Weapon.h"
 
 int main()
 {
@@ -12,9 +13,20 @@ int main()
 
 	sf::Texture playerTextureSheet = TextureHolder::GetTexture("graphics/players/tilemap_packed.png");
 	Player player(playerTextureSheet);
+	player.setPosition({ 1920.0f / 2, 1080.0f / 2 });
+
+	sf::Texture weaponTexture = TextureHolder::GetTexture("graphics/weapons/tilemap_packed.png");
+	Weapon weapon(weaponTexture);
+	weapon.attachTo(player, 24.0f);
 
 	sf::VideoMode desktopVideoMode = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(desktopVideoMode, "Desert Shooter by Eric");
+	sf::Vector2f screenResolution(desktopVideoMode.size);
+	
+	sf::View camera;
+	camera.setSize(screenResolution);
+	camera.zoom(.3f);
+	camera.setCenter(player.getPosition());
 
 	sf::Clock clock;
 	while (window.isOpen())
@@ -29,11 +41,16 @@ int main()
 		sf::Time deltaTime = clock.restart();
 		float delta = deltaTime.asSeconds();
 
+		sf::Vector2f globalMousePosition = window.mapPixelToCoords(sf::Mouse::getPosition(window));
+
 		player.update(delta);
+		weapon.update(delta, globalMousePosition);
 
 		window.clear(sf::Color::White);
-
+		
+		window.setView(camera);
 		window.draw(player);
+		window.draw(weapon);
 
 		window.display();
 	}

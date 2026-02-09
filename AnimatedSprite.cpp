@@ -3,21 +3,31 @@
 
 bool AnimatedSprite::isFrameInsideBounds(sf::Vector2u frame)
 {
-	bool isInsideX = frame.x * m_SpriteSize <= m_SpritesheetBounds.size.x;
-	bool isInsideY = frame.y * m_SpriteSize <= m_SpritesheetBounds.size.y;
+	bool isInsideX = frame.x < m_ColumnCount;
+	bool isInsideY = frame.y < m_RowCount;
 
 	return isInsideX && isInsideY;
 }
 
 void AnimatedSprite::updateFrame()
 {
-	sf::IntRect textureRect = m_SpritesheetBounds;
+	sf::IntRect textureRect;
 
 	textureRect.position.x = m_CurrentFrame * m_SpriteSize;
-	textureRect.position.y = m_CurrentRow   * m_SpriteSize;
-	
+	textureRect.position.y = m_CurrentRow   * m_SpriteSize;	
 	textureRect.size.x = m_SpriteSize;
 	textureRect.size.y = m_SpriteSize;
+
+	if (m_FlipHorizontal)
+	{
+		textureRect.position.x += m_SpriteSize;
+		textureRect.size.x *= -1;
+	}
+	if (m_FlipVertical)
+	{
+		textureRect.position.y += m_SpriteSize;
+		textureRect.size.y *= -1;
+	}
 
 	setTextureRect(textureRect);
 }
@@ -39,16 +49,14 @@ void AnimatedSprite::nextFrame()
 }
 
 AnimatedSprite::AnimatedSprite(
-	sf::IntRect spritesheetBounds, 
 	unsigned int spriteSize,
 	unsigned int rowCount,
 	unsigned int columnCount,
 	sf::Texture& texture) : sf::Sprite(texture)
 {
-	assert(rowCount	   * spriteSize <= spritesheetBounds.size.y);
-	assert(columnCount * spriteSize <= spritesheetBounds.size.x);
+	m_FlipHorizontal = false;
+	m_FlipVertical   = false;
 
-	m_SpritesheetBounds = spritesheetBounds;
 	m_SpriteSize  = spriteSize;
 	m_RowCount    = rowCount;
 	m_ColumnCount = columnCount;
@@ -65,6 +73,16 @@ void AnimatedSprite::setAnimation(unsigned int startFrame, unsigned int finalFra
 	m_CurrentRow   = row;
 	m_TimeBetweenFramesInSeconds = delayInSeconds;
 	m_IsLooping = loop;
+}
+
+void AnimatedSprite::setFrame(unsigned int frameIndex, unsigned int row)
+{
+	assert(isFrameInsideBounds({ frameIndex, row }));
+
+	m_CurrentFrame = frameIndex;
+	m_CurrentRow   = row;
+
+	updateFrame();
 }
 
 void AnimatedSprite::update(float delta)
@@ -97,6 +115,28 @@ void AnimatedSprite::play()
 	m_TimeSinceLastFrameInSeconds = 0;
 
 	updateFrame();
+}
+
+void AnimatedSprite::flipHorizontal()
+{
+	m_FlipHorizontal = !m_FlipHorizontal;
+	updateFrame();
+}
+
+void AnimatedSprite::flipVertical()
+{
+	m_FlipVertical = !m_FlipVertical;
+	updateFrame();
+}
+
+bool AnimatedSprite::isFlipedVertical() const
+{
+	return m_FlipVertical;
+}
+
+bool AnimatedSprite::isFlipedHorizontal() const
+{
+	return m_FlipHorizontal;
 }
 
 bool AnimatedSprite::isPlaying() const
