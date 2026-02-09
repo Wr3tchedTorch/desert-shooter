@@ -8,6 +8,9 @@ Weapon::Weapon(sf::Texture& texture, sf::Vector2f origin) : m_Sprite(SPRITE_SIZE
 
 	m_StartOrigin = origin;
 	setOrigin(origin);
+
+	m_CurrentBulletIndex = 0;
+	m_Bullets = new Bullet[MAX_BULLETS_ALLOWED];
 }
 
 void Weapon::attachTo(Transformable& target, float offset)
@@ -20,6 +23,20 @@ void Weapon::attachTo(Transformable& target, float offset)
 
 void Weapon::update(float delta, sf::Vector2f mousePosition)
 {
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Button::Left))
+	{
+		shoot(50, 300);
+	}
+
+	for (int i = 0; i < MAX_BULLETS_ALLOWED; i++)
+	{
+		Bullet& bullet = m_Bullets[i];
+		if (bullet.isActive())
+		{
+			bullet.update(delta);
+		}
+	}
+
     setPosition(m_Parent->getPosition());
 	move({0, 4});
 
@@ -41,4 +58,24 @@ void Weapon::update(float delta, sf::Vector2f mousePosition)
 	}
 
     setRotation(rotation);
+}
+
+void Weapon::shoot(float damage, float speed)
+{	
+	Bullet& bullet = m_Bullets[m_CurrentBulletIndex];
+
+	bullet.setPosition(getPosition());
+	bullet.setAppearance(sf::Color::Blue, 5);
+	bullet.spawn(damage, speed, {1, 0});
+
+	m_CurrentBulletIndex++;
+	if (m_CurrentBulletIndex >= 100)
+	{
+		m_CurrentBulletIndex = 0;
+	}
+}
+
+Bullet* Weapon::getBullets()
+{
+	return m_Bullets;
 }
