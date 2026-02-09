@@ -1,23 +1,28 @@
 #include "Weapon.h"
 #include <iostream>
 
-Weapon::Weapon(sf::Texture& texture) : m_Sprite(24, 4, 10, texture)
+Weapon::Weapon(sf::Texture& texture, sf::Vector2f origin) : m_Sprite(SPRITE_SIZE, 4, 10, texture)
 {
 	m_Parent = nullptr;
 	m_Sprite.setFrame(5, 0);
+
+	m_StartOrigin = origin;
+	setOrigin(origin);
 }
 
 void Weapon::attachTo(Transformable& target, float offset)
 {
 	m_Parent = &target;
-	
-	setOrigin({ -12.0f,  12.0f});	
+
+	setOrigin(m_StartOrigin);
 	setPosition(m_Parent->getPosition());
 }
 
 void Weapon::update(float delta, sf::Vector2f mousePosition)
 {
     setPosition(m_Parent->getPosition());
+	move({0, 4});
+
     sf::Vector2f direction = mousePosition - getPosition();
 
     sf::Angle rotation = direction.angle();
@@ -30,6 +35,9 @@ void Weapon::update(float delta, sf::Vector2f mousePosition)
 		!m_Sprite.isFlipedVertical() && isPointingLeft)
 	{
 		m_Sprite.flipVertical();
+
+		float newYOrigin = SPRITE_SIZE - getOrigin().y + 1;
+		setOrigin({ getOrigin().x, newYOrigin });
 	}
 
     setRotation(rotation);

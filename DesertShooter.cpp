@@ -16,11 +16,16 @@ int main()
 	player.setPosition({ 1920.0f / 2, 1080.0f / 2 });
 
 	sf::Texture weaponTexture = TextureHolder::GetTexture("graphics/weapons/tilemap_packed.png");
-	Weapon weapon(weaponTexture);
+	Weapon weapon(weaponTexture, {-6, 10});
 	weapon.attachTo(player, 24.0f);
+
+	sf::Texture aimTexture = TextureHolder::GetTexture("graphics/ui/aim_01.png");
+	sf::Sprite  aimSprite(aimTexture);
+	aimSprite.setOrigin({ aimTexture.getSize().x / 2.0f, aimTexture.getSize().y / 2.0f });
 
 	sf::VideoMode desktopVideoMode = sf::VideoMode::getDesktopMode();
 	sf::RenderWindow window(desktopVideoMode, "Desert Shooter by Eric");
+	window.setMouseCursorVisible(false);
 	sf::Vector2f screenResolution(desktopVideoMode.size);
 	
 	sf::View camera;
@@ -45,12 +50,14 @@ int main()
 
 		player.update(delta);
 		weapon.update(delta, globalMousePosition);
+		aimSprite.setPosition(globalMousePosition);
 
 		window.clear(sf::Color::White);
 		
 		window.setView(camera);
 		window.draw(player);
 		window.draw(weapon);
+		window.draw(aimSprite);
 
 		window.display();
 	}
