@@ -27,7 +27,7 @@ public:
 		unsigned int spriteSize,
 		unsigned int rowCount,
 		unsigned int columnCount,
-		sf::Texture& texture
+		const sf::Texture& texture
 	);
 
 	void setAnimation(
